@@ -62,3 +62,28 @@ chmod +x scripts/airgap-bundler.sh scripts/airgap-verify.sh
 ./scripts/airgap-verify.sh ./dist/<extracted_dir>
 # or
 ./scripts/airgap-verify.sh --tar ./dist/<bundle>.tar.gz
+```
+
+## What I learned
+
+- Air-gap discipline is about reduction. Whitelisting file types and sizes does more for safety than complex blacklists.
+- Reproducibility builds trust. A signed manifest and a deterministic packaging flow make reviews and audits simpler.
+- Cross-platform nuisances matter. sha256sum vs shasum -a 256, stat differences (Linux vs macOS), and optional tools availability all require graceful fallbacks.
+
+## Issues I hit and how I resolved them
+- Different hash tools on macOS vs Linux
+  Resolution: Auto-detect and use whichever is available.
+- stat output differences (size detection)
+  Resolution: Try GNU stat first, fallback to BSD stat.
+- Optional tools not installed (exiftool, clamscan, gpg)
+  Resolution: Treat them as best-effort features; warn and continue without failing the core bundle.
+- Preserving relative paths from find
+  Resolution: Build paths relative to --src and recreate directory structure on copy.
+
+## Future improvements
+
+- SBOM generation (e.g., syft) for code or container payloads
+- Templated policy gates per classification level
+- JSON manifest + signature envelope
+
+
